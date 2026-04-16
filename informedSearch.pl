@@ -14,13 +14,13 @@ grid(2, [[r, e, s],
          [d, f, e],
          [e, s, e]]).
 
-% grid(3,[
-%   [r, d, d, s, e],
-%   [e, s, s, e, d],
-%   [e, f, f, e, d],
-%   [e, e, d, e, e],
-%   [f, e, e, e, e]
-% ]).
+grid(3,[
+  [r, d, d, s, e],
+  [e, s, s, e, d],
+  [e, f, f, e, d],
+  [e, e, d, e, e],
+  [f, e, e, e, e]
+]).
 get_survivors(Grid, Survivors) :-
     findall((R,C),
         (nth1(R, Grid, Row),
@@ -68,6 +68,8 @@ move(state(R,C,Surv,Coll), state(NR,NC,NSurv,NColl), Grid) :-
 delete_one([H|T], H, T) :- !.
 delete_one([H|T], X, [H|NT]) :- delete_one(T, X, NT).
 
+manual_abs(A, B, D) :-
+    (A >= B -> D is A - B ; D is B - A).
 
 heuristic(R, C, Remaining, Collected, H) :-
     ( Remaining = [] ->
@@ -75,7 +77,9 @@ heuristic(R, C, Remaining, Collected, H) :-
     ;
         findall(D,
             (member((SR,SC), Remaining),
-             D is abs(R-SR) + abs(C-SC)),
+             manual_abs(R, SR, DR),
+             manual_abs(C, SC, DC),
+             D is DR + DC),
             Ds),
         msort(Ds, [Min|_]),
         H is -(Collected * 100) + Min
